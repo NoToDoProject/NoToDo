@@ -6,6 +6,6 @@ import "github.com/NoToDoProject/NoToDo/common/response"
 func NotFoundRoute() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		nc := response.ContextEx{Context: c}
-		nc.Failure(response.NotFound, "Can't find the resource.")
+		nc.NotFound()
 	}
 }
