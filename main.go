@@ -10,6 +10,7 @@ import (
 	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
@@ -101,6 +102,11 @@ func init() {
 	log.SetLevel(log.TraceLevel)
 }
 
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
 // main 主函数
 func main() {
 	config, _ := loadConfig() // 加载配置文件
@@ -130,9 +136,52 @@ func main() {
 	}
 	engine.Use(middlewares...) // 使用中间件
 
+	// get 测试
 	engine.GET("/ping", func(c *gin.Context) {
 		nc := response.ContextEx{Context: c}
 		nc.Failure(response.Error, "pong")
+	})
+
+	// websocket 测试
+	engine.GET("/ws", func(c *gin.Context) {
+		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			log.Errorf("Failed to set websocket upgrade: %+v", err)
+			return
+		}
+
+		logger := log.WithFields(log.Fields{
+			"remote_addr": c.Request.RemoteAddr,
+		})
+
+		defer func(ws *websocket.Conn) {
+			err := ws.Close()
+			if err != nil {
+				logger.Errorf("Failed to close websocket: %+v", err)
+			}
+		}(ws)
+
+		logger.Infof("<<- New websocket connection")
+		for {
+			messageType, message, err := ws.ReadMessage()
+			if err != nil {
+				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+					logger.Infof("<<- Websocket connection closed")
+					break
+				}
+				logger.Errorf("Failed to read message: %+v", err)
+				break
+			}
+
+			logger.Infof("<<- %s", message)
+
+			err = ws.WriteMessage(messageType, message)
+			logger.Infof("->> %s", message)
+			if err != nil {
+				logger.Errorf("Failed to write message: %+v", err)
+				break
+			}
+		}
 	})
 
 	err := engine.Run(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port)) // 监听并启动服务
