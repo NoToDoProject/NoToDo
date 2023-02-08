@@ -7,3 +7,5 @@ mongo:
   db: notodo
   user: notodo
   password: notodo
+log:
+  level: info

@@ -3,8 +3,9 @@ module github.com/NoToDoProject/NoToDo
 go 1.20
 
 require (
-	github.com/gin-gonic/gin v1.8.2 // gin web framework
-	github.com/spf13/viper v1.15.0 // viper config
+	github.com/gin-gonic/gin v1.8.2 // gin web framework HTTP框架
+	github.com/spf13/viper v1.15.0 // viper config 配置管理
+	github.com/sirupsen/logrus v1.9.0 // logrus logger 日志管理
 )
 
 require (
