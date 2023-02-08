@@ -20,7 +20,7 @@ func LogMiddleware() gin.HandlerFunc {
 		c.Next()
 		statusCode := c.Writer.Status()
 		fields := log.Fields{
-			"status": statusCode,
+			"Status": statusCode,
 		}
 		spendTime := c.GetString("spend_time")
 		if spendTime != "" {
