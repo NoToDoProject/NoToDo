@@ -10,3 +10,4 @@
 - [logrus](https://github.com/sirupsen/logrus) - 日志处理
 - [gin-cors](https://github.com/gin-contrib/cors) - 跨域处理
 - [websocket](https://github.com/gorilla/websocket) - websocket
+- [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - mongodb数据库驱动

@@ -2,10 +2,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/NoToDoProject/NoToDo/common"
 	"github.com/NoToDoProject/NoToDo/common/response"
 	"github.com/NoToDoProject/NoToDo/controller"
+	db "github.com/NoToDoProject/NoToDo/database"
 	"github.com/NoToDoProject/NoToDo/middleware"
 	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-contrib/cors"
@@ -13,6 +15,8 @@ import (
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"go.mongodb.org/mongo-driver/bson"
+	"net/http"
 	"os"
 	"time"
 )
@@ -48,11 +52,7 @@ func loadConfig() (config model.Config, err error) {
 		{Path: "server.host", Env: "SERVER_HOST", Default: "0.0.0.0"},
 		{Path: "server.port", Env: "SERVER_PORT", Default: "8080"},
 
-		{Path: "mongo.host", Env: "MONGO_HOST", Default: "127.0.0.1"},
-		{Path: "mongo.port", Env: "MONGO_PORT", Default: "27017"},
-		{Path: "mongo.db", Env: "MONGO_DB", Default: "notodo"},
-		{Path: "mongo.user", Env: "MONGO_USER", Default: "notodo"},
-		{Path: "mongo.password", Env: "MONGO_PASSWORD", Default: "notodo"},
+		{Path: "mongo.uri", Env: "MONGO_URI", Default: "mongodb://localhost:27017"},
 
 		{Path: "log.level", Env: "LOG_LEVEL", Default: "info"},
 	}
@@ -84,7 +84,7 @@ func loadConfig() (config model.Config, err error) {
 
 // init 初始化
 func init() {
-	//gin.SetMode(gin.ReleaseMode)   // 设置gin运行模式
+	gin.SetMode(gin.ReleaseMode) // 设置gin运行模式
 	//gin.DefaultWriter = io.Discard // 设置gin日志输出到空
 
 	// 设置日志格式为Text格式
@@ -103,6 +103,9 @@ func init() {
 }
 
 var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
@@ -111,6 +114,14 @@ var upgrader = websocket.Upgrader{
 func main() {
 	config, _ := loadConfig() // 加载配置文件
 	log.Debug(fmt.Sprintf("config: %v", config))
+
+	db.Connect(config.Mongo.Uri) // 连接数据库
+	cur, _ := db.GetDatabase().Collection("test").Find(context.Background(), bson.M{})
+	for cur.Next(context.Background()) {
+		var result bson.M
+		_ = cur.Decode(&result)
+		log.Debug(result)
+	}
 
 	engine := gin.New()                        // 创建无中间件应用
 	_ = engine.SetTrustedProxies(nil)          // 允许所有代理
@@ -184,6 +195,7 @@ func main() {
 		}
 	})
 
+	log.Infof("Server is running at %s:%s", config.Server.Host, config.Server.Port)
 	err := engine.Run(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port)) // 监听并启动服务
 	if err != nil {
 		log.Fatal(err)

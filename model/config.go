@@ -7,11 +7,7 @@ type Config struct {
 		Port string
 	}
 	Mongo struct {
-		Host     string
-		Port     string
-		Db       string
-		User     string
-		Password string
+		Uri string
 	}
 	Log struct {
 		Level string
