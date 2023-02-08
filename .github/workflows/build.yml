@@ -1,0 +1,38 @@
+name: build
+
+on:
+  push:
+    branches: [ "dev", "master" ]
+  pull_request:
+    branches: [ "dev", "master" ]
+  workflow_dispatch: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.commits[0].message, '[skip ci]') == false &&
+      contains(github.event.commits[0].message, '[ci skip]') == false
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Windows AMD64 binary
+        run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -x -v -o build/notodo_windows_amd64.exe github.com/NoToDoProject/NoToDo
+
+      - name: Build Linux AMD64 binary
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -x -v -o build/notodo_linux_amd64 github.com/NoToDoProject/NoToDo
+
+      - name: Build Darwin ARM64 binary
+        run: CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -x -v -o build/notodo_darwin_arm64 github.com/NoToDoProject/NoToDo
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: notodo_binary
+          path: build/
