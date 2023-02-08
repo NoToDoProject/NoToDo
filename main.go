@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NoToDoProject/NoToDo/common"
 	"github.com/NoToDoProject/NoToDo/common/response"
+	"github.com/NoToDoProject/NoToDo/controller"
 	"github.com/NoToDoProject/NoToDo/middleware"
 	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-gonic/gin"
@@ -103,21 +104,22 @@ func main() {
 	config, _ := loadConfig() // 加载配置文件
 	log.Debug(fmt.Sprintf("config: %v", config))
 
-	engine := gin.New()               // 创建无中间件应用
-	_ = engine.SetTrustedProxies(nil) // 允许所有代理
+	engine := gin.New()                        // 创建无中间件应用
+	_ = engine.SetTrustedProxies(nil)          // 允许所有代理
+	engine.NoRoute(controller.NotFoundRoute()) // 设置404路由
 
-	// 设置中间件
+	// 设置全局中间件
 	middlewares := []gin.HandlerFunc{
 		middleware.GetRemotePortMiddleware(), // 设置获取客户端端口中间件
 		middleware.LogMiddleware(),           // 设置日志中间件
 		middleware.TimerMiddleware(),         // 设置计时中间件
-		gin.Recovery(),                       // 设置恢复中间件
+		middleware.Recovery(),                // 设置恢复中间件
 	}
 	engine.Use(middlewares...) // 使用中间件
 
 	engine.GET("/ping", func(c *gin.Context) {
 		nc := response.ContextEx{Context: c}
-		nc.Failure(response.ERROR, "pong")
+		nc.Failure(response.Error, "pong")
 	})
 
 	err := engine.Run(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port)) // 监听并启动服务
