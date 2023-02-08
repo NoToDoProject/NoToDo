@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"github.com/NoToDoProject/NoToDo/common"
+	"github.com/NoToDoProject/NoToDo/common/response"
 	"github.com/NoToDoProject/NoToDo/middleware"
 	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-gonic/gin"
@@ -93,7 +94,7 @@ func init() {
 	// 日志消息输出可以是任意的io.writer类型
 	log.SetOutput(os.Stdout)
 
-	// 设置日志级别为Trace以上
+	// 设置日志级别为Trace
 	log.SetLevel(log.TraceLevel)
 }
 
@@ -115,9 +116,8 @@ func main() {
 	engine.Use(middlewares...) // 使用中间件
 
 	engine.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
+		nc := response.ContextEx{Context: c}
+		nc.Failure(response.ERROR, "pong")
 	})
 
 	err := engine.Run(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port)) // 监听并启动服务
