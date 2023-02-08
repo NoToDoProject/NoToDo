@@ -8,10 +8,12 @@ import (
 	"github.com/NoToDoProject/NoToDo/controller"
 	"github.com/NoToDoProject/NoToDo/middleware"
 	"github.com/NoToDoProject/NoToDo/model"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
+	"time"
 )
 
 // loadConfig 读取配置
@@ -110,6 +112,17 @@ func main() {
 
 	// 设置全局中间件
 	middlewares := []gin.HandlerFunc{
+		cors.New(cors.Config{
+			AllowOrigins:     []string{"*"},
+			AllowMethods:     []string{"GET", "POST"},
+			AllowHeaders:     []string{"Origin", "Content-Type"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			AllowOriginFunc: func(origin string) bool {
+				return true
+			},
+			MaxAge: 12 * time.Hour,
+		}), // 设置跨域中间件
 		middleware.GetRemotePortMiddleware(), // 设置获取客户端端口中间件
 		middleware.LogMiddleware(),           // 设置日志中间件
 		middleware.TimerMiddleware(),         // 设置计时中间件

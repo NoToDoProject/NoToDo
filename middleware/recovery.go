@@ -15,7 +15,7 @@ func Recovery() gin.HandlerFunc {
 					"error": err,
 				}).Error("Recovery")
 				nc := response.ContextEx{Context: c}
-				nc.Response(500, response.InternalServerError, "Internal Server Error", nil)
+				nc.InternalServerError()
 			}
 		}()
 		c.Next()
