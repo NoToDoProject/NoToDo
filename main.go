@@ -2,85 +2,20 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"github.com/NoToDoProject/NoToDo/common"
-	"github.com/NoToDoProject/NoToDo/common/response"
+	"github.com/NoToDoProject/NoToDo/config"
 	"github.com/NoToDoProject/NoToDo/controller"
+	"github.com/NoToDoProject/NoToDo/controller/user"
 	db "github.com/NoToDoProject/NoToDo/database"
 	"github.com/NoToDoProject/NoToDo/middleware"
-	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 	"os"
 	"time"
 )
-
-// loadConfig 读取配置
-func loadConfig() (config model.Config, err error) {
-	// 读取 .env 文件并设置环境变量
-	if common.IsFileExists(".env") {
-		v := viper.New()
-		v.SetConfigName(".env") // 读取 .env 文件
-		v.SetConfigType("env")  // 使用 env 格式
-		v.AddConfigPath(".")    // 读取当前目录
-		err = v.ReadInConfig()  // 读取配置文件
-		if err != nil {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
-		}
-		// 循环设置环境变量
-		for _, key := range v.AllKeys() {
-			err := os.Setenv(key, v.GetString(key))
-			if err != nil {
-				return model.Config{}, err
-			}
-		}
-	}
-
-	// 读取 config.yaml 文件
-	v := viper.New()
-	v.SetConfigName("config")
-	v.SetConfigType("yaml")
-	v.AddConfigPath(".")
-
-	configInfos := []model.ConfigInfo{
-		{Path: "server.host", Env: "SERVER_HOST", Default: "0.0.0.0"},
-		{Path: "server.port", Env: "SERVER_PORT", Default: "8080"},
-
-		{Path: "mongo.uri", Env: "MONGO_URI", Default: "mongodb://localhost:27017"},
-
-		{Path: "log.level", Env: "LOG_LEVEL", Default: "info"},
-	}
-
-	for _, config := range configInfos {
-		v.SetDefault(config.Path, config.Default)
-		err = v.BindEnv(config.Path, config.Env)
-		if err != nil {
-			return model.Config{}, err
-		}
-	}
-
-	v.AutomaticEnv() // 读取环境变量
-	err = v.ReadInConfig()
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Error("Config not exists, using default config and environment variables.")
-		} else {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
-		}
-	}
-
-	err = v.Unmarshal(&config) // 反序列化
-	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
-	}
-	return
-}
 
 // init 初始化
 func init() {
@@ -112,16 +47,10 @@ var upgrader = websocket.Upgrader{
 
 // main 主函数
 func main() {
-	config, _ := loadConfig() // 加载配置文件
-	log.Debug(fmt.Sprintf("config: %v", config))
+	config.LoadConfig() // 加载配置文件
+	log.Debug(fmt.Sprintf("config: %v", config.Config))
 
-	db.Connect(config.Mongo.Uri) // 连接数据库
-	cur, _ := db.GetDatabase().Collection("test").Find(context.Background(), bson.M{})
-	for cur.Next(context.Background()) {
-		var result bson.M
-		_ = cur.Decode(&result)
-		log.Debug(result)
-	}
+	db.Connect() // 连接数据库
 
 	engine := gin.New()                        // 创建无中间件应用
 	_ = engine.SetTrustedProxies(nil)          // 允许所有代理
@@ -147,11 +76,8 @@ func main() {
 	}
 	engine.Use(middlewares...) // 使用中间件
 
-	// get 测试
-	engine.GET("/ping", func(c *gin.Context) {
-		nc := response.ContextEx{Context: c}
-		nc.Failure(response.Error, "pong")
-	})
+	// 设置路由
+	user.InitRouter(engine) // 用户操作
 
 	// websocket 测试
 	engine.GET("/ws", func(c *gin.Context) {
@@ -184,10 +110,13 @@ func main() {
 				break
 			}
 
-			logger.Infof("<<- %s", message)
+			logger.Infof("<<- WS Recv: %-10s", message)
 
+			for i, j := 0, len(message)-1; i < j; i, j = i+1, j-1 {
+				message[i], message[j] = message[j], message[i]
+			}
 			err = ws.WriteMessage(messageType, message)
-			logger.Infof("->> %s", message)
+			logger.Infof("->> WS Send: %-10s", message)
 			if err != nil {
 				logger.Errorf("Failed to write message: %+v", err)
 				break
@@ -195,8 +124,8 @@ func main() {
 		}
 	})
 
-	log.Infof("Server is running at %s:%s", config.Server.Host, config.Server.Port)
-	err := engine.Run(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port)) // 监听并启动服务
+	log.Infof("Server is running at %s:%s", config.Config.Server.Host, config.Config.Server.Port)
+	err := engine.Run(fmt.Sprintf("%s:%s", config.Config.Server.Host, config.Config.Server.Port)) // 监听并启动服务
 	if err != nil {
 		log.Fatal(err)
 	}

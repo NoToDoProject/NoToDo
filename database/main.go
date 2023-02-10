@@ -2,6 +2,9 @@ package database
 
 import (
 	"context"
+	"github.com/NoToDoProject/NoToDo/config"
+	dbConfig "github.com/NoToDoProject/NoToDo/database/config"
+	"github.com/NoToDoProject/NoToDo/database/user"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -10,25 +13,18 @@ import (
 )
 
 var (
-	mongoInstance *mongo.Client   = nil
-	database      *mongo.Database = nil
-	ctx, cancel                   = context.WithTimeout(context.Background(), 10*time.Second)
+	// mongoInstance mongo实例
+	mongoInstance *mongo.Client = nil
+	// Database      数据库实例
+	Database *mongo.Database = nil
 )
 
-func init() {
-	log.Debugf("database init")
+// Connect 连接数据库
+func Connect() {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	//clientOpts := options.Client().ApplyURI(
-	//	"mongodb://localhost:27017/?connect=direct")
-	//client, err := mongo.Connect(context.TODO(), clientOpts)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//mongoInstance = client
-}
-
-func Connect(uri string) {
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Config.Mongo.Uri))
 	if err != nil {
 		log.Fatalf("database create error: %s", err)
 	}
@@ -38,9 +34,12 @@ func Connect(uri string) {
 		log.Fatalf("database connect error: %s", err)
 	}
 	log.Info("database connected")
-	database = mongoInstance.Database("notodo")
-}
+	Database = mongoInstance.Database("notodo")
 
-func GetDatabase() *mongo.Database {
-	return database
+	// 读取配置
+	dbConfig.Collection = Database.Collection("config")
+	dbConfig.LoadConfig()
+
+	// 初始化集合
+	user.Collection = Database.Collection("user")
 }
