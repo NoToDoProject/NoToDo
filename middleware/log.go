@@ -10,22 +10,32 @@ func LogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
 		reqUrl := c.Request.URL.Path // c.Request.RequestURI 区别：RequestURI 包含查询参数
-		clientIP := c.ClientIP()     // c.RemoteIP() 区别：ClientIP 会优先获取 X-Forwarded-For
-		log.WithFields(log.Fields{
-			"Method":     method,
-			"Url":        reqUrl,
-			"ClientIp":   clientIP,
-			"ClientPort": c.GetInt("remote_port"),
-		}).Info("<- HTTP In")
+		fields := log.Fields{
+			"Method": method,
+			"Url":    reqUrl,
+			"Client": c.Request.RemoteAddr,
+		}
+		logText := "<- HTTP In"
+		if c.IsWebsocket() {
+			logText = "<<- WebSocket In"
+		}
+		log.WithFields(fields).Info(logText)
+
 		c.Next()
 		statusCode := c.Writer.Status()
-		fields := log.Fields{
+
+		fields = log.Fields{
 			"Status": statusCode,
 		}
 		spendTime := c.GetString("spend_time")
 		if spendTime != "" {
 			fields["Last"] = spendTime
 		}
-		log.WithFields(fields).Info("-> HTTP Out")
+
+		logText = "-> HTTP Out"
+		if c.IsWebsocket() {
+			logText = "->> Websocket finished"
+		}
+		log.WithFields(fields).Info(logText)
 	}
 }

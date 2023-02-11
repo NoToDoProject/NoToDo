@@ -69,10 +69,9 @@ func main() {
 			},
 			MaxAge: 12 * time.Hour,
 		}), // 设置跨域中间件
-		middleware.GetRemotePortMiddleware(), // 设置获取客户端端口中间件
-		middleware.LogMiddleware(),           // 设置日志中间件
-		middleware.TimerMiddleware(),         // 设置计时中间件
-		middleware.Recovery(),                // 设置恢复中间件
+		middleware.LogMiddleware(),   // 设置日志中间件
+		middleware.TimerMiddleware(), // 设置计时中间件
+		middleware.Recovery(),        // 设置恢复中间件
 	}
 	engine.Use(middlewares...) // 使用中间件
 
@@ -81,6 +80,10 @@ func main() {
 
 	// websocket 测试
 	engine.GET("/ws", func(c *gin.Context) {
+		if !c.IsWebsocket() {
+			log.Errorf("Not websocket request")
+			return
+		}
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
 			log.Errorf("Failed to set websocket upgrade: %+v", err)
