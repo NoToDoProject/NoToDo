@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  notodo:
+    container_name: notodo
+    build:
+      context: .
+      args:
+        - GOPROXY=${GOPROXY}
+    ports:
+      - "8888:8888"
+    env_file:
+      - .env

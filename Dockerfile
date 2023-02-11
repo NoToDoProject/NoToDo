@@ -15,5 +15,5 @@ RUN export GOOS=${GOOS} && \
 # 构建镜像
 FROM scratch
 COPY --from=builder /work/build/notodo /usr/local/bin/notodo
-EXPOSE 8080
+EXPOSE 8888
 ENTRYPOINT ["/usr/local/bin/notodo"]
