@@ -31,5 +31,4 @@ steps:
       MONGO_URI:
         from_secret: mongo_uri
     commands:
-      - echo $MONGO_URI | rev | cut -c 1-6 | rev
       - docker compose up -d
