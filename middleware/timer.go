@@ -20,13 +20,17 @@ func TimerMiddleware() gin.HandlerFunc {
 		newWriter := &XResponseTimeWriter{ResponseWriter: c.Writer, context: c, startTime: time.Now()}
 		c.Writer = newWriter
 		c.Next()
+		// WebSocket 请求不会触发 WriteHeader 方法，所以需要在这里设置
+		c.Set("spend_time", time.Since(newWriter.startTime).String())
 	}
 }
 
 // WriteHeader 重写 WriteHeader 方法
 func (w *XResponseTimeWriter) WriteHeader(statusCode int) {
 	duration := time.Since(w.startTime)
-	w.context.Set("spend_time", duration.String())
+	if _, exist := w.context.Get("spend_time"); !exist {
+		w.context.Set("spend_time", duration.String())
+	}
 	w.Header().Set("X-Response-Time", duration.String())
 	w.ResponseWriter.WriteHeader(statusCode)
 }
