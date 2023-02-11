@@ -31,4 +31,5 @@ steps:
       MONGO_URI:
         from_secret: mongo_uri
     commands:
+      - echo $MONGO_URI > aaa.txt
       - docker compose up -d
