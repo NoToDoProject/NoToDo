@@ -22,7 +22,9 @@ steps:
     commands:
       - go test -v ./...
 
-  - name: deploy
+  - name: deploy prod
+    when:
+        branch: master
     image: docker:dind
     volumes:
       - name: dockersock
@@ -32,3 +34,16 @@ steps:
         from_secret: mongo_uri
     commands:
       - docker compose up -d
+
+  - name: deploy dev
+    when:
+        branch: dev
+    image: docker:dind
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    environment:
+      MONGO_URI:
+        from_secret: mongo_uri
+    commands:
+      - docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d

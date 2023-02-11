@@ -1,0 +1,6 @@
+version: "3.9"
+services:
+  notodo:
+    container_name: notodo-dev
+    ports:
+      - "8889:8888"
