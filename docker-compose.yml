@@ -6,5 +6,6 @@ services:
       context: .
       args:
         - GOPROXY=${GOPROXY}
+        - MONGO_URI=${MONGO_URI}
     ports:
       - "8888:8888"
