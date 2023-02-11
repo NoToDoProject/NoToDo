@@ -5,9 +5,6 @@ name: deploy notodo
 clone:
   retries: 3
 
-environment:
-  GOPROXY: https://goproxy.cn
-
 volumes:
   - name: dockersock
     host:
@@ -17,7 +14,10 @@ steps:
   - name: test
     image: golang:1.20
     commands:
+      - echo "GOPROXY: $GOPROXY"
       - go test -v ./...
+    environment:
+      GOPROXY: https://goproxy.cn
 
   - name: deploy
     image: docker:dind
@@ -25,4 +25,9 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     commands:
+      - echo "GOPROXY: $GOPROXY"
       - docker compose up -d
+    environment:
+      GOPROXY: https://goproxy.cn
+      MONGO_URI:
+        from_secret: MONGO_URI
