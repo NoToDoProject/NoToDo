@@ -14,8 +14,6 @@ RUN export GOOS=${GOOS} && \
 
 # 构建镜像
 FROM scratch
-ARG MONGO_URI=mongodb://localhost:27017
-ENV MONGO_URI=${MONGO_URI}
 COPY --from=builder /work/build/notodo /usr/local/bin/notodo
 EXPOSE 8888
 ENTRYPOINT ["/usr/local/bin/notodo"]
