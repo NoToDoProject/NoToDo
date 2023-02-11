@@ -1,0 +1,28 @@
+kind: pipeline
+type: docker
+name: deploy notodo
+
+clone:
+  retries: 3
+
+environment:
+  GOPROXY: https://goproxy.cn
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
+steps:
+  - name: test
+    image: golang:1.20
+    commands:
+      - go test -v ./...
+
+  - name: deploy
+    image: docker:dind
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    commands:
+      - docker compose up -d
