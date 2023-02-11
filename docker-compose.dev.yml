@@ -1,6 +1,12 @@
 version: "3.9"
 services:
-  notodo:
+  notodo-dev:
     container_name: notodo-dev
+    build:
+      context: .
+      args:
+        - GOPROXY=${GOPROXY}
+    environment:
+      - MONGO_URI=${MONGO_URI}
     ports:
       - "8889:8888"
