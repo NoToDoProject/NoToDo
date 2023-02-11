@@ -41,7 +41,7 @@ func LoadConfig() {
 
 	configInfos := []model.ConfigInfo{
 		{Path: "server.host", Env: "SERVER_HOST", Default: "0.0.0.0"},
-		{Path: "server.port", Env: "SERVER_PORT", Default: "8080"},
+		{Path: "server.port", Env: "SERVER_PORT", Default: "8888"},
 
 		{Path: "mongo.uri", Env: "MONGO_URI", Default: "mongodb://localhost:27017"},
 
