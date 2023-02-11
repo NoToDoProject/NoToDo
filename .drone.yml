@@ -2,6 +2,9 @@ kind: pipeline
 type: docker
 name: deploy notodo
 
+trigger:
+  branch: [master, dev]
+
 clone:
   retries: 3
 
@@ -24,9 +27,9 @@ steps:
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
+    environment:
+      MONGO_URI:
+        from_secret: mongo_uri
     commands:
       - echo $MONGO_URI
       - docker compose up -d
-    environment:
-      MONGO_URI:
-        from_secret: MONGO_URI
