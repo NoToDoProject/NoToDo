@@ -1,0 +1,49 @@
+kind: pipeline
+type: docker
+name: deploy notodo
+
+trigger:
+  branch: [master, dev]
+
+clone:
+  retries: 3
+
+environment:
+  GOPROXY: https://goproxy.cn
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
+steps:
+  - name: test
+    image: golang:1.20
+    commands:
+      - go test -v ./...
+
+  - name: deploy prod
+    when:
+        branch: master
+    image: docker:dind
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    environment:
+      MONGO_URI:
+        from_secret: mongo_uri
+    commands:
+      - docker compose up -d
+
+  - name: deploy dev
+    when:
+        branch: dev
+    image: docker:dind
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    environment:
+      MONGO_URI:
+        from_secret: mongo_uri
+    commands:
+      - docker compose -f docker-compose.dev.yml up -d
