@@ -14,7 +14,8 @@ steps:
   - name: test
     image: golang:1.20
     commands:
-      - echo "GOPROXY: $GOPROXY"
+      - echo $GOPROXY
+      - echo $${GOPROXY}
       - go test -v ./...
     environment:
       GOPROXY: https://goproxy.cn
@@ -25,7 +26,8 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     commands:
-      - echo "GOPROXY: $GOPROXY"
+      - echo $GOPROXY
+      - echo $${GOPROXY}
       - docker compose up -d
     environment:
       GOPROXY: https://goproxy.cn
