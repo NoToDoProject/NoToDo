@@ -46,4 +46,4 @@ steps:
       MONGO_URI:
         from_secret: mongo_uri
     commands:
-      - docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+      - docker compose -f docker-compose.dev.yml up -d
