@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/NoToDoProject/NoToDo/config"
 	"github.com/NoToDoProject/NoToDo/controller"
+	"github.com/NoToDoProject/NoToDo/controller/server"
 	"github.com/NoToDoProject/NoToDo/controller/user"
 	db "github.com/NoToDoProject/NoToDo/database"
 	"github.com/NoToDoProject/NoToDo/middleware"
+	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -76,7 +78,13 @@ func main() {
 	engine.Use(middlewares...) // 使用中间件
 
 	// 设置路由
-	user.InitRouter(engine) // 用户操作
+	routers := []model.Controller{
+		server.Server{}, // 服务器相关
+		user.User{},     // 用户相关
+	}
+	for _, router := range routers {
+		router.InitRouter(engine)
+	}
 
 	// websocket 测试
 	engine.GET("/ws", func(c *gin.Context) {

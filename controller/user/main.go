@@ -6,8 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// User Controller
+type User struct {
+}
+
 // InitRouter 初始化路由
-func InitRouter(r *gin.Engine) {
+func (_ User) InitRouter(r *gin.Engine) {
 	userGroup := r.Group("/user")
 	{
 		userGroup.GET("/exist", IsUserExist)
