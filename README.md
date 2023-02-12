@@ -6,6 +6,25 @@
 
 NoToDo (pronounced /nɒt tʊ duː/, like Not To Do)
 
+Demo: [NoToDo(WIP)](https://notodo.akagiyui.com)
+
+## Quick Start
+
+### Docker
+
+```bash
+export MONGO_URL=<YOUR_MONGO_URL>
+docker-compose up -d
+```
+
+### Source
+
+```bash
+export MONGO_URL=<YOUR_MONGO_URL>
+go run main.go
+```
+
+
 ## Packages
 
 - [gin](https://github.com/gin-gonic/gin) - web框架
