@@ -20,7 +20,17 @@ func (c *ContextEx) Response(status int, code Code, msg string, data interface{}
 }
 
 // Success 成功响应
-func (c *ContextEx) Success(data interface{}) {
+func (c *ContextEx) Success(data ...interface{}) {
+	// if len == 0, data = nil
+	if len(data) == 0 {
+		c.Response(http.StatusOK, Success, "Success", nil)
+		return
+	}
+	// if len == 1, data = data[0]
+	if len(data) == 1 {
+		c.Response(http.StatusOK, Success, "Success", data[0])
+		return
+	}
 	c.Response(http.StatusOK, Success, "Success", data)
 }
 
