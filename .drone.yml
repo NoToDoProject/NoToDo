@@ -4,6 +4,7 @@ name: deploy notodo
 
 trigger:
   branch: [master, dev]
+  event: [push]
 
 clone:
   retries: 3
@@ -19,7 +20,7 @@ volumes:
 
 steps:
   - name: test
-    image: golang:1.20
+    image: golang:1.20-alpine
     commands:
       - go test -v ./...
 
