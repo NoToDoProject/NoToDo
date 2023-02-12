@@ -25,9 +25,19 @@ func GetConfig(key string) any {
 	err := Collection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		log.Errorf("find config error: %s", err)
-		return nil
+		return err
 	}
 	return result.Value
+}
+
+// SetConfig 设置配置
+func SetConfig(key string, value any) {
+	filter := map[string]string{"k": key}
+	update := map[string]any{"$set": map[string]any{"v": value}}
+	_, err := Collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Errorf("update config error: %s", err)
+	}
 }
 
 // LoadConfig 加载配置
@@ -35,4 +45,12 @@ func LoadConfig() {
 	NeedRegisterEmailVerification = GetConfig("NeedRegisterEmailVerification").(bool)
 
 	log.Debugf("NeedRegisterEmailVerification: %t", NeedRegisterEmailVerification)
+}
+
+// SetDefaultConfigIfNotExist 设置默认配置
+func SetDefaultConfigIfNotExist() {
+	// 是否需要注册邮箱验证
+	if GetConfig("NeedRegisterEmailVerification") == mongo.ErrNoDocuments {
+		SetConfig("NeedRegisterEmailVerification", false)
+	}
 }

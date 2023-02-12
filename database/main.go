@@ -36,8 +36,9 @@ func Connect() {
 	log.Info("database connected")
 	Database = mongoInstance.Database("notodo")
 
-	// 读取配置
 	dbConfig.Collection = Database.Collection("config")
+	dbConfig.SetDefaultConfigIfNotExist()
+	// 读取配置
 	dbConfig.LoadConfig()
 
 	// 初始化集合
