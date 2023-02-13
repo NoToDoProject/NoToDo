@@ -42,6 +42,7 @@ func init() {
 	log.SetLevel(log.TraceLevel)
 }
 
+var startTime = time.Now() // 启动时间
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
@@ -145,6 +146,7 @@ func main() {
 
 	go func() {
 		log.Infof("Server is running at %s:%s", config.Config.Server.Host, config.Config.Server.Port)
+		log.Debugf("Start using: %s", time.Since(startTime).String())
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
