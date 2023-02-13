@@ -1,5 +1,5 @@
 # 构建二进制文件
-FROM golang:1.20 as builder
+FROM golang:1.20-alpine as builder
 COPY . /work
 WORKDIR /work
 ARG GOPROXY

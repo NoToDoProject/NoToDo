@@ -2,18 +2,23 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/NoToDoProject/NoToDo/config"
 	"github.com/NoToDoProject/NoToDo/controller"
-	"github.com/NoToDoProject/NoToDo/controller/user"
+	serverController "github.com/NoToDoProject/NoToDo/controller/server"
+	userController "github.com/NoToDoProject/NoToDo/controller/user"
 	db "github.com/NoToDoProject/NoToDo/database"
 	"github.com/NoToDoProject/NoToDo/middleware"
+	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -37,6 +42,7 @@ func init() {
 	log.SetLevel(log.TraceLevel)
 }
 
+var startTime = time.Now() // 启动时间
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
@@ -76,7 +82,13 @@ func main() {
 	engine.Use(middlewares...) // 使用中间件
 
 	// 设置路由
-	user.InitRouter(engine) // 用户操作
+	routers := []model.Controller{
+		serverController.Server{}, // 服务器相关
+		userController.User{},     // 用户相关
+	}
+	for _, router := range routers {
+		router.InitRouter(engine)
+	}
 
 	// websocket 测试
 	engine.GET("/ws", func(c *gin.Context) {
@@ -127,9 +139,28 @@ func main() {
 		}
 	})
 
-	log.Infof("Server is running at %s:%s", config.Config.Server.Host, config.Config.Server.Port)
-	err := engine.Run(fmt.Sprintf("%s:%s", config.Config.Server.Host, config.Config.Server.Port)) // 监听并启动服务
-	if err != nil {
-		log.Fatal(err)
+	server := &http.Server{
+		Addr:    fmt.Sprintf("%s:%s", config.Config.Server.Host, config.Config.Server.Port),
+		Handler: engine,
 	}
+
+	go func() {
+		log.Infof("Server is running at %s:%s", config.Config.Server.Host, config.Config.Server.Port)
+		log.Debugf("Start using: %s", time.Since(startTime).String())
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Info("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Panic("Server Shutdown:", err)
+	}
+	log.Info("Server exiting")
 }

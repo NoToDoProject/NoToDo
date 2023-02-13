@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"github.com/NoToDoProject/NoToDo/config"
-	dbConfig "github.com/NoToDoProject/NoToDo/database/config"
 	"github.com/NoToDoProject/NoToDo/database/user"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -36,9 +35,8 @@ func Connect() {
 	log.Info("database connected")
 	Database = mongoInstance.Database("notodo")
 
-	// 读取配置
-	dbConfig.Collection = Database.Collection("config")
-	dbConfig.LoadConfig()
+	ConfigCollection = Database.Collection("config")
+	LoadConfig() // 读取配置
 
 	// 初始化集合
 	user.Collection = Database.Collection("user")

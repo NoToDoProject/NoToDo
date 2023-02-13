@@ -1,0 +1,27 @@
+version: "3.9"
+
+networks:
+  notodo:
+    external: false
+
+services:
+  notodo:
+    build:
+      context: .
+      args:
+        - GOPROXY=${GOPROXY}
+    networks:
+      - notodo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/notodo
+    ports:
+      - "8888:8888"
+
+  mongo:
+    image: mongo:6
+    networks:
+      - notodo
+    hostname: mongo
+    volumes:
+      - mongo_db:/data/db
+      - mongo_configdb:/data/configdb
