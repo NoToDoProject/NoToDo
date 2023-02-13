@@ -50,10 +50,15 @@ func AddUser(user model.User) bool {
 // GetUser 获取用户
 func GetUser(_user model.IsUserExist) (user model.User, err error) {
 	filter, err := bson.Marshal(_user)
+	if err != nil {
+		log.Errorf("marshal user %+v error: %s", _user, err)
+		return
+	}
 	r := Collection.FindOne(context.Background(), filter)
 	if r.Err() == mongo.ErrNoDocuments {
 		log.Errorf("user %+v not found", _user)
 		err = r.Err()
+		return
 	}
 	err = r.Decode(&user)
 	return

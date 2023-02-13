@@ -152,7 +152,7 @@ func main() {
 		}
 	}()
 
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Info("Shutdown Server ...")
@@ -160,7 +160,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		log.Panic("Server Shutdown:", err)
 	}
 	log.Info("Server exiting")
 }
