@@ -4,16 +4,11 @@ package response
 type Code int
 
 const (
-	// Success 成功
-	Success Code = 1000
-	// Error 一般错误
-	Error Code = 1001
-	// NotFound 未找到
-	NotFound Code = 1002
-	// InternalServerError 服务器错误
-	InternalServerError Code = 1003
-	// ParameterError 参数错误
-	ParameterError Code = 1004
-	// Unauthorized 未授权
-	Unauthorized Code = 1005
+	Success             Code = 1000 // 成功
+	Error               Code = 1001 // 一般错误
+	NotFound            Code = 1002 // 未找到
+	InternalServerError Code = 1003 // 服务器错误
+	ParameterError      Code = 1004 // 参数错误
+	Unauthorized        Code = 1005 // 未授权
+	RegisterDisabled    Code = 1006 // 注册已关闭
 )

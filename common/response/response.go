@@ -95,3 +95,8 @@ func (c *ContextEx) ParameterError() {
 func (c *ContextEx) LoginError() {
 	c.Response(http.StatusOK, Unauthorized, "User not exist or password error", nil)
 }
+
+// RegisterDisabled 注册已关闭响应
+func (c *ContextEx) RegisterDisabled() {
+	c.Response(http.StatusOK, RegisterDisabled, "Register disabled", nil)
+}
