@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  notodo-dev:
+  notodo:
     container_name: notodo-dev
     build:
       context: .

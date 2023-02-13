@@ -35,7 +35,11 @@ steps:
       MONGO_URI:
         from_secret: mongo_uri
     commands:
-      - docker compose up -d
+      - cd ..
+      - mv src notodo
+      - cd notodo
+      - docker compose build notodo
+      - docker compose up -d --no-deps
 
   - name: deploy dev
     when:
@@ -48,4 +52,8 @@ steps:
       MONGO_URI:
         from_secret: mongo_uri
     commands:
-      - docker compose -f docker-compose.dev.yml up -d
+      - cd ..
+      - mv src notodo-dev
+      - cd notodo-dev
+      - docker compose build notodo
+      - docker compose -f docker-compose.dev.yml up -d --no-deps
