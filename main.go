@@ -2,11 +2,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/NoToDoProject/NoToDo/config"
 	"github.com/NoToDoProject/NoToDo/controller"
-	"github.com/NoToDoProject/NoToDo/controller/server"
-	"github.com/NoToDoProject/NoToDo/controller/user"
+	serverController "github.com/NoToDoProject/NoToDo/controller/server"
+	userController "github.com/NoToDoProject/NoToDo/controller/user"
 	db "github.com/NoToDoProject/NoToDo/database"
 	"github.com/NoToDoProject/NoToDo/middleware"
 	"github.com/NoToDoProject/NoToDo/model"
@@ -16,6 +17,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -79,8 +82,8 @@ func main() {
 
 	// 设置路由
 	routers := []model.Controller{
-		server.Server{}, // 服务器相关
-		user.User{},     // 用户相关
+		serverController.Server{}, // 服务器相关
+		userController.User{},     // 用户相关
 	}
 	for _, router := range routers {
 		router.InitRouter(engine)
@@ -135,9 +138,27 @@ func main() {
 		}
 	})
 
-	log.Infof("Server is running at %s:%s", config.Config.Server.Host, config.Config.Server.Port)
-	err := engine.Run(fmt.Sprintf("%s:%s", config.Config.Server.Host, config.Config.Server.Port)) // 监听并启动服务
-	if err != nil {
-		log.Fatal(err)
+	server := &http.Server{
+		Addr:    fmt.Sprintf("%s:%s", config.Config.Server.Host, config.Config.Server.Port),
+		Handler: engine,
 	}
+
+	go func() {
+		log.Infof("Server is running at %s:%s", config.Config.Server.Host, config.Config.Server.Port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Info("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
+	}
+	log.Info("Server exiting")
 }
