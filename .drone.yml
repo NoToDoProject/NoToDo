@@ -36,7 +36,7 @@ steps:
         from_secret: mongo_uri
     commands:
       - cd ..
-      - mv src notodo
+      - cp src notodo
       - cd notodo
       - docker compose build notodo
       - docker compose up -d --no-deps
@@ -53,7 +53,7 @@ steps:
         from_secret: mongo_uri
     commands:
       - cd ..
-      - mv src notodo-dev
+      - cp src notodo-dev
       - cd notodo-dev
       - docker compose build notodo
       - docker compose -f docker-compose.dev.yml up -d --no-deps
