@@ -12,4 +12,8 @@ const (
 	NotFound Code = 1002
 	// InternalServerError 服务器错误
 	InternalServerError Code = 1003
+	// ParameterError 参数错误
+	ParameterError Code = 1004
+	// Unauthorized 未授权
+	Unauthorized Code = 1005
 )
