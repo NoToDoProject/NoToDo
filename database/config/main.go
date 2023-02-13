@@ -15,8 +15,9 @@ type Config struct {
 // Collection mongo集合
 var Collection *mongo.Collection
 
-// NeedRegisterEmailVerification 是否需要注册邮箱验证
-var NeedRegisterEmailVerification = false
+var (
+	NeedRegisterEmailVerification = false // 是否需要注册邮箱验证
+)
 
 // GetConfig 获取配置
 func GetConfig(key string) any {
