@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	log "github.com/sirupsen/logrus"
+	"runtime/debug"
 )
 
 // Recovery 恢复中间件，捕获500错误
@@ -16,11 +17,11 @@ func Recovery() gin.HandlerFunc {
 				if _, ok := err.(validator.ValidationErrors); ok {
 					return
 				}
-				log.WithFields(log.Fields{
-					"error": err,
-				}).Error("Recovery")
+				log.Errorf("Recovery from panic: %v", err)
+				debug.PrintStack()
 				nc := response.ContextEx{Context: c}
 				nc.InternalServerError()
+				nc.Abort()
 			}
 		}()
 		c.Next()
