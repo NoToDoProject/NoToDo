@@ -1,6 +1,9 @@
 package user
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/NoToDoProject/NoToDo/middleware"
+	"github.com/gin-gonic/gin"
+)
 
 // User Controller
 type User struct {
@@ -9,9 +12,15 @@ type User struct {
 // InitRouter 初始化路由
 func (_ User) InitRouter(r *gin.Engine) {
 	userGroup := r.Group("/user")
+	userGroup.Use()
 	{
-		userGroup.GET("/exist", IsUserExist)  // 判断用户是否存在
-		userGroup.POST("/login", Login)       // 登录
-		userGroup.POST("/register", Register) // 注册
+		userGroup.POST("/login", middleware.AuthMiddleware.LoginHandler) // 登录
+		userGroup.POST("/register", Register)                            // 注册
+	}
+	userGroup.Use(middleware.MiddleFunc)
+	{
+		userGroup.GET("/info", Info)                                              // 获取自身信息
+		userGroup.GET("/exist", IsUserExist)                                      // 判断用户是否存在
+		userGroup.GET("/refresh-token", middleware.AuthMiddleware.RefreshHandler) // 刷新token
 	}
 }

@@ -63,6 +63,7 @@ go run main.go
 - [websocket](https://github.com/gorilla/websocket) - WebSocket
 - [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - mongodb数据库驱动
 - [crypto](https://pkg.go.dev/golang.org/x/crypto) - 密码加密
+- [gin-jwt](https://github.com/appleboy/gin-jwt) - JWT认证
 
 ### 运行测试
 

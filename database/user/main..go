@@ -64,6 +64,19 @@ func GetUser(_user model.IsUserExist) (user model.User, err error) {
 	return
 }
 
+// GetUserByUid 通过uid获取用户
+func GetUserByUid(uid int) (user model.User, err error) {
+	filter := bson.M{"uid": uid}
+	r := Collection.FindOne(context.Background(), filter)
+	if r.Err() == mongo.ErrNoDocuments {
+		log.Errorf("user uid %d not found", uid)
+		err = r.Err()
+		return
+	}
+	err = r.Decode(&user)
+	return
+}
+
 // GetUnusedUid 获取未使用的uid，从1开始
 func GetUnusedUid() (uid int) {
 	filter := bson.M{} // 查询所有

@@ -10,9 +10,11 @@ require (
 	github.com/spf13/viper v1.15.0 // viper config 配置管理
 	go.mongodb.org/mongo-driver v1.11.1 // mongo driver mongodb驱动
 	golang.org/x/crypto v0.6.0 // crypto 加密
+	github.com/appleboy/gin-jwt/v2 v2.9.1 // JWT
 )
 
 require (
+	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

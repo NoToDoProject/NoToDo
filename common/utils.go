@@ -1,6 +1,8 @@
 package common
 
 import (
+	"fmt"
+	"github.com/NoToDoProject/NoToDo/model"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"os"
@@ -35,7 +37,7 @@ func ComparePassword(hashedPassword []byte, password string) bool {
 }
 
 // CopyStruct 复制结构体
-func CopyStruct(src, dst interface{}) {
+func CopyStruct(src, dst any) {
 	srcValue := reflect.ValueOf(src)
 	dstValue := reflect.ValueOf(dst)
 
@@ -56,4 +58,9 @@ func CopyStruct(src, dst interface{}) {
 			}
 		}
 	}
+}
+
+// MakeNewPassword 生成新密码
+func MakeNewPassword(user model.UserLogin) string {
+	return fmt.Sprintf("%s%s%s", user.Password, "notodo", user.Username)
 }

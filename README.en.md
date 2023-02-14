@@ -58,6 +58,7 @@ go run main.go
 - [websocket](https://github.com/gorilla/websocket) - WebSocket
 - [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - MongoDB Driver
 - [crypto](https://pkg.go.dev/golang.org/x/crypto) - Password encryption
+- [gin-jwt](https://github.com/appleboy/gin-jwt) - JWT
 
 ### Test
 

@@ -1,6 +1,8 @@
 package response
 
 import (
+	"github.com/NoToDoProject/NoToDo/common"
+	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"net/http"
@@ -37,7 +39,7 @@ func (c *ContextEx) BindQuery(obj any) error {
 }
 
 // Response 响应
-func (c *ContextEx) Response(status int, code Code, msg string, data interface{}) {
+func (c *ContextEx) Response(status int, code Code, msg string, data any) {
 	c.Header("Content-Type", "application/json; charset=utf-8")
 	c.JSON(status, gin.H{
 		"code": code,
@@ -47,7 +49,7 @@ func (c *ContextEx) Response(status int, code Code, msg string, data interface{}
 }
 
 // Success 成功响应
-func (c *ContextEx) Success(data ...interface{}) {
+func (c *ContextEx) Success(data ...any) {
 	// if len == 0, data = nil
 	if len(data) == 0 {
 		c.Response(http.StatusOK, Success, "", nil)
@@ -99,4 +101,14 @@ func (c *ContextEx) LoginError() {
 // RegisterDisabled 注册已关闭响应
 func (c *ContextEx) RegisterDisabled() {
 	c.Response(http.StatusOK, RegisterDisabled, "Register disabled", nil)
+}
+
+// GetUser 获取用户
+func (c *ContextEx) GetUser() model.User {
+	if user, ok := c.Get(common.IdentityKeyInContext); ok {
+		if u, ok := user.(model.User); ok {
+			return u
+		}
+	}
+	panic("Get user from context failed")
 }
