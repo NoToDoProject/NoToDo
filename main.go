@@ -26,20 +26,6 @@ import (
 func init() {
 	gin.SetMode(gin.ReleaseMode) // 设置gin运行模式
 	//gin.DefaultWriter = io.Discard // 设置gin日志输出到空
-
-	// 设置日志格式为Text格式
-	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: "2006-01-02 15:04:05", // 时间格式
-		ForceColors:     true,                  // 强制颜色
-		//FullTimestamp:   true,                  // 显示完整时间
-	})
-
-	// 设置将日志输出到标准输出（默认的输出为stderr）
-	// 日志消息输出可以是任意的io.writer类型
-	log.SetOutput(os.Stdout)
-
-	// 设置日志级别为Trace
-	log.SetLevel(log.TraceLevel)
 }
 
 var startTime = time.Now() // 启动时间
