@@ -119,3 +119,17 @@ func Login(c *gin.Context) (any, error) {
 	// 登录成功
 	return userGotten, nil
 }
+
+// IsAdminMiddleware 管理员中间件
+func IsAdminMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		nc := response.ContextEx{Context: c}
+		user := nc.GetUser()
+		if !user.IsAdmin {
+			nc.Unauthorized()
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}

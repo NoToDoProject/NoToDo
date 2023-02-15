@@ -19,8 +19,8 @@ func (_ User) InitRouter(r *gin.Engine) {
 	}
 	userGroup.Use(middleware.MiddleFunc)
 	{
-		userGroup.GET("/info", Info)                                              // 获取自身信息
-		userGroup.GET("/exist", IsUserExist)                                      // 判断用户是否存在
-		userGroup.GET("/refresh-token", middleware.AuthMiddleware.RefreshHandler) // 刷新token
+		userGroup.GET("/", Info)                                                                                  // 获取自身信息
+		userGroup.GET("/exist", middleware.IsAdminMiddleware(), IsUserExist)                                      // 判断用户是否存在
+		userGroup.GET("/refresh_token", middleware.IsAdminMiddleware(), middleware.AuthMiddleware.RefreshHandler) // 刷新token
 	}
 }

@@ -15,10 +15,10 @@ func (_ Server) InitRouter(r *gin.Engine) {
 	userGroup.Use()
 	{
 		userGroup.GET("/info", Information)         // 获取服务器信息
-		userGroup.GET("/can-register", CanRegister) // 获取是否允许注册
+		userGroup.GET("/can_register", CanRegister) // 获取是否允许注册
 	}
 	userGroup.Use(middleware.MiddleFunc)
 	{
-		userGroup.POST("/refresh-config", RefreshConfig) // 刷新配置
+		userGroup.POST("/refresh_config", middleware.IsAdminMiddleware(), RefreshConfig) // 刷新配置
 	}
 }
