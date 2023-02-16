@@ -40,6 +40,27 @@ var upgrader = websocket.Upgrader{
 // main 主函数
 func main() {
 	config.LoadConfig() // 加载配置文件
+
+	// 设置日志等级
+	switch config.Config.Log.Level {
+	case "trace":
+		log.SetLevel(log.TraceLevel)
+	case "debug":
+		log.SetLevel(log.DebugLevel)
+	case "info":
+		log.SetLevel(log.InfoLevel)
+	case "warn":
+		log.SetLevel(log.WarnLevel)
+	case "error":
+		log.SetLevel(log.ErrorLevel)
+	case "fatal":
+		log.SetLevel(log.FatalLevel)
+	case "panic":
+		log.SetLevel(log.PanicLevel)
+	default:
+		log.SetLevel(log.InfoLevel)
+	}
+
 	log.Debug(fmt.Sprintf("config: %v", config.Config))
 
 	db.Connect() // 连接数据库

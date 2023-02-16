@@ -16,7 +16,4 @@ func init() {
 	// 设置将日志输出到标准输出（默认的输出为stderr）
 	// 日志消息输出可以是任意的io.writer类型
 	log.SetOutput(os.Stdout)
-
-	// 设置日志级别为Trace
-	log.SetLevel(log.TraceLevel)
 }
