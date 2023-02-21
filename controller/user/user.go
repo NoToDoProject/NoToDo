@@ -74,7 +74,7 @@ func register(c *gin.Context) {
 		return
 	}
 
-	if !userDb.AllocateUid(newUser) {
+	if !userDb.AllocateUID(newUser) {
 		nc.Failure(response.Error, "Allocate uid failed")
 		return
 	}

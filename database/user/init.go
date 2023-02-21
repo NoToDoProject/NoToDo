@@ -109,8 +109,8 @@ func IsEmailExist(email string) bool {
 	return count > 0
 }
 
-// AllocateUid give an uid to user with -1 uid
-func AllocateUid(user model.User) bool {
+// AllocateUID give an uid to user with -1 uid
+func AllocateUID(user model.User) bool {
 	if user.Uid != -1 {
 		log.Panicf("user %s already has uid: %d", user.Username, user.Uid)
 	}

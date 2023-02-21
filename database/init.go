@@ -17,7 +17,7 @@ var (
 	// mongoInstance mongoDB client
 	mongoInstance *mongo.Client = nil
 	// database      database instance
-	database *mongo.Database = nil
+	database *mongo.Database
 )
 
 // Connect connect to database

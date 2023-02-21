@@ -1,3 +1,4 @@
+// Package user API to operate user.
 package user
 
 import (
@@ -10,7 +11,7 @@ type User struct {
 }
 
 // InitRouter add user router
-func (_ User) InitRouter(r *gin.Engine) {
+func (User) InitRouter(r *gin.Engine) {
 	userGroup := r.Group("/user")
 	userGroup.Use()
 	{

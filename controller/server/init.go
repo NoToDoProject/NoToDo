@@ -11,7 +11,7 @@ type Server struct {
 }
 
 // InitRouter add server router
-func (_ Server) InitRouter(r *gin.Engine) {
+func (Server) InitRouter(r *gin.Engine) {
 	userGroup := r.Group("/server")
 	userGroup.Use()
 	{

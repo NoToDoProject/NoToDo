@@ -1,3 +1,4 @@
+// Package todo_API to operate todo_list.
 package todo
 
 import (
@@ -10,7 +11,7 @@ type Todos struct {
 }
 
 // InitRouter add todo_router
-func (_ Todos) InitRouter(r *gin.Engine) {
+func (Todos) InitRouter(r *gin.Engine) {
 	todoGroup := r.Group("/todo")
 	todoGroup.Use(middleware.MiddleFunc)
 	{

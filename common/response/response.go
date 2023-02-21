@@ -1,3 +1,4 @@
+// Package response implements a response package for NoToDo.
 package response
 
 import (
