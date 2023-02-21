@@ -6,7 +6,7 @@
 不要做！！！，NoToDo，发音 /nɒt tʊ duː/，即 Not To Do，
 是一个基于Web的待办事项管理应用，支持多用户，~~多设备同步(WIP)~~。
 
-简体中文 | [English](./README.en.md)
+简体中文 | [English](./README-EN.md)
 
 在线示例 : [NoToDo.akagiyui.com(WIP)](https://notodo.akagiyui.com)
 
@@ -57,15 +57,15 @@ go run main.go
 
 ### 依赖
 
-- [gin](https://github.com/gin-gonic/gin) - Web框架
-- [viper](https://github.com/spf13/viper) - 配置管理
-- [logrus](https://github.com/sirupsen/logrus) - 日志处理
-- [gin-cors](https://github.com/gin-contrib/cors) - 跨域处理
-- [websocket](https://github.com/gorilla/websocket) - WebSocket
-- [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - mongodb数据库驱动
-- [crypto](https://pkg.go.dev/golang.org/x/crypto) - 密码加密
-- [gin-jwt](https://github.com/appleboy/gin-jwt) - JWT认证
-- [nanoid](https://github.com/jaevor/go-nanoid) - NanoID 生成
+-   [gin](https://github.com/gin-gonic/gin) - Web框架
+-   [viper](https://github.com/spf13/viper) - 配置管理
+-   [logrus](https://github.com/sirupsen/logrus) - 日志处理
+-   [gin-cors](https://github.com/gin-contrib/cors) - 跨域处理
+-   [websocket](https://github.com/gorilla/websocket) - WebSocket
+-   [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - mongoDB驱动
+-   [crypto](https://pkg.go.dev/golang.org/x/crypto) - 密码加密
+-   [gin-jwt](https://github.com/appleboy/gin-jwt) - JWT认证
+-   [nanoid](https://github.com/jaevor/go-nanoid) - NanoID 生成
 
 ### 运行测试
 

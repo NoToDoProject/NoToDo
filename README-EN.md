@@ -33,7 +33,6 @@ Supported environment variables and configuration items are as follows:
 | MONGO_URI             | mongo.uri     | mongodb://localhost:27017 | MongoDB URI    |
 | LOG_LEVEL             | log.level     | info                      | Log Level      |
 
-
 ### Docker
 
 You must modify `docker-compose.yml` for configuration.
@@ -52,15 +51,15 @@ go run main.go
 
 ### Dependencies
 
-  - [gin](https://github.com/gin-gonic/gin) - Web framework
-  - [viper](https://github.com/spf13/viper) - Configuration management
-  - [logrus](https://github.com/sirupsen/logrus) - Log
-  - [gin-cors](https://github.com/gin-contrib/cors) - CORS
-  - [websocket](https://github.com/gorilla/websocket) - WebSocket
-  - [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - MongoDB Driver
-  - [crypto](https://pkg.go.dev/golang.org/x/crypto) - Password encryption
-  - [gin-jwt](https://github.com/appleboy/gin-jwt) - JWT
-  - [nanoid](https://github.com/jaevor/go-nanoid) - NanoID generator
+-   [gin](https://github.com/gin-gonic/gin) - Web framework
+-   [viper](https://github.com/spf13/viper) - Configuration management
+-   [logrus](https://github.com/sirupsen/logrus) - Log
+-   [gin-cors](https://github.com/gin-contrib/cors) - CORS
+-   [websocket](https://github.com/gorilla/websocket) - WebSocket
+-   [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - MongoDB Driver
+-   [crypto](https://pkg.go.dev/golang.org/x/crypto) - Password encryption
+-   [gin-jwt](https://github.com/appleboy/gin-jwt) - JWT
+-   [nanoid](https://github.com/jaevor/go-nanoid) - NanoID generator
 
 ### Test
 
