@@ -10,32 +10,38 @@ import (
 	"time"
 )
 
-// IsUserExist 判断用户是否存在
-func IsUserExist(c *gin.Context) {
+// isUserExist check user exist
+func isUserExist(c *gin.Context) {
 	nc := response.ContextEx{Context: c}
 
-	// 获取参数
+	// get params
 	var isExist model.IsUserExist
 	_ = nc.BindQuery(&isExist)
 
 	nc.Success(userDb.IsUserExist(isExist))
 }
 
-// Register 注册
-func Register(c *gin.Context) {
+// register user register
+func register(c *gin.Context) {
 	nc := response.ContextEx{Context: c}
 
-	// 检查是否允许注册
+	// check register enable
 	if !database.Config.CanRegister {
 		nc.RegisterDisabled()
 		return
 	}
 
-	// 获取注册信息
+	// todo wip
+	if database.Config.NeedRegisterEmailVerification {
+		nc.Failure(response.Error, "Register need email verification")
+		return
+	}
+
+	// get params
 	var registerInfo model.UserRegister
 	_ = nc.BindJSON(&registerInfo)
 
-	// 检查用户是否存在
+	// check user exist
 	var isExistInfo model.IsUserExist
 	common.CopyStruct(&registerInfo, &isExistInfo)
 	if userDb.IsUserExist(isExistInfo) {
@@ -43,12 +49,18 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// 注册成功
+	// check email exist
+	if userDb.IsEmailExist(registerInfo.Email) {
+		nc.Failure(response.Error, "Email already exists")
+		return
+	}
+
+	// save user
 	var newUser model.User
 	common.CopyStruct(&registerInfo, &newUser)
 	var userLogin model.UserLogin
 	common.CopyStruct(&registerInfo, &userLogin)
-	newUser.Uid = -1 // 验证通过后分配uid
+	newUser.Uid = -1 // allocate after email verify
 	newUser.Password = common.EncryptPassword(common.MakeNewPassword(userLogin))
 	newUser.Nickname = newUser.Username
 	newUser.Disabled = false
@@ -62,12 +74,16 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// todo 邮箱唯一约束
+	if !userDb.AllocateUid(newUser) {
+		nc.Failure(response.Error, "Allocate uid failed")
+		return
+	}
+
 	nc.Success("register success")
 }
 
-// Info 用户信息
-func Info(c *gin.Context) {
+// info get user info
+func info(c *gin.Context) {
 	nc := response.ContextEx{Context: c}
 	user := nc.GetUser()
 	nc.Success(user)

@@ -5,17 +5,22 @@ import (
 	"github.com/NoToDoProject/NoToDo/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"net/http"
 )
 
-// ContextEx 扩展 Context
+// ContextEx extend gin.Context
 type ContextEx struct {
 	*gin.Context
 }
 
-// BindWith 绑定查询参数
+// BindWith override gin bind
 func (c *ContextEx) BindWith(obj any, binding binding.Binding) error {
 	err := c.ShouldBindWith(obj, binding)
+	// when body is empty, err is EOF
+	if _, ok := err.(error); ok {
+		err = validator.ValidationErrors{}
+	}
 	if err != nil {
 		c.ParameterError()
 		panic(err)
@@ -23,22 +28,32 @@ func (c *ContextEx) BindWith(obj any, binding binding.Binding) error {
 	return err
 }
 
-// Bind 绑定查询参数
+// Bind general bind
 func (c *ContextEx) Bind(obj any) error {
 	return c.BindWith(obj, binding.Default(c.Request.Method, c.ContentType()))
 }
 
-// BindJSON 绑定 JSON
+// BindJSON bind json
 func (c *ContextEx) BindJSON(obj any) error {
 	return c.BindWith(obj, binding.JSON)
 }
 
-// BindQuery 绑定查询参数
+// BindQuery bind query
 func (c *ContextEx) BindQuery(obj any) error {
 	return c.BindWith(obj, binding.Query)
 }
 
-// Response 响应
+// GetUser get user in context
+func (c *ContextEx) GetUser() model.User {
+	if user, ok := c.Get(common.IdentityKeyInContext); ok {
+		if u, ok := user.(model.User); ok {
+			return u
+		}
+	}
+	panic("Get user from context failed")
+}
+
+// Response general response
 func (c *ContextEx) Response(status int, code Code, msg string, data any) {
 	c.Header("Content-Type", "application/json; charset=utf-8")
 	c.JSON(status, gin.H{
@@ -48,14 +63,12 @@ func (c *ContextEx) Response(status int, code Code, msg string, data any) {
 	})
 }
 
-// Success 成功响应
+// Success general success
 func (c *ContextEx) Success(data ...any) {
-	// if len == 0, data = nil
 	if len(data) == 0 {
 		c.Response(http.StatusOK, Success, "", nil)
 		return
 	}
-	// if len == 1, data = data[0]
 	if len(data) == 1 {
 		c.Response(http.StatusOK, Success, "", data[0])
 		return
@@ -63,52 +76,47 @@ func (c *ContextEx) Success(data ...any) {
 	c.Response(http.StatusOK, Success, "", data)
 }
 
-// Failure 失败响应
+// Failure general failure
 func (c *ContextEx) Failure(code Code, msg string) {
 	c.Response(http.StatusOK, code, msg, nil)
 }
 
-// Unauthorized 未授权响应
+// Unauthorized unauthorized
 func (c *ContextEx) Unauthorized() {
 	c.Response(http.StatusUnauthorized, Error, "Unauthorized", nil)
 }
 
-// InternalServerError 服务器错误响应
+// InternalServerError server error
 func (c *ContextEx) InternalServerError() {
 	c.Response(http.StatusInternalServerError, InternalServerError, "Internal Server Error", nil)
 }
 
-// NotFound 未找到响应
+// NotFound not found
 func (c *ContextEx) NotFound() {
 	c.Response(http.StatusNotFound, NotFound, "Not Found", nil)
 }
 
-// NoContent 无内容响应
+// NoContent no content
 func (c *ContextEx) NoContent() {
 	c.Status(http.StatusNoContent)
 }
 
-// ParameterError 参数错误响应
+// ParameterError parameter error
 func (c *ContextEx) ParameterError() {
 	c.Response(http.StatusBadRequest, ParameterError, "Parameter error", nil)
 }
 
-// LoginError 登录错误响应
+// LoginError login error
 func (c *ContextEx) LoginError() {
 	c.Response(http.StatusOK, Unauthorized, "User not exist or password error", nil)
 }
 
-// RegisterDisabled 注册已关闭响应
+// RegisterDisabled register disabled
 func (c *ContextEx) RegisterDisabled() {
 	c.Response(http.StatusOK, RegisterDisabled, "Register disabled", nil)
 }
 
-// GetUser 获取用户
-func (c *ContextEx) GetUser() model.User {
-	if user, ok := c.Get(common.IdentityKeyInContext); ok {
-		if u, ok := user.(model.User); ok {
-			return u
-		}
-	}
-	panic("Get user from context failed")
+// TodoListAlreadyExist todolist already exist
+func (c *ContextEx) TodoListAlreadyExist() {
+	c.Response(http.StatusOK, TodoListAlreadyExist, "Todo list already exist", nil)
 }

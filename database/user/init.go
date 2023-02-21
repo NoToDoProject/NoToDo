@@ -9,10 +9,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Collection mongo集合
+// Collection mongo collection
 var Collection *mongo.Collection
 
-// IsUserExist 判断用户是否存在
+// IsUserExist check user exist
 func IsUserExist(user model.IsUserExist) bool {
 	filter, _ := bson.Marshal(user)
 	count, err := Collection.CountDocuments(context.Background(), filter)
@@ -24,7 +24,7 @@ func IsUserExist(user model.IsUserExist) bool {
 	return count > 0
 }
 
-// IsUserExistWithPassword 判断密码是否正确
+// IsUserExistWithPassword check user exist with password
 func IsUserExistWithPassword(user model.UserWithPassword) bool {
 	filter, _ := bson.Marshal(user)
 	count, err := Collection.CountDocuments(context.Background(), filter)
@@ -36,7 +36,7 @@ func IsUserExistWithPassword(user model.UserWithPassword) bool {
 	return count > 0
 }
 
-// AddUser 添加用户
+// AddUser add user
 func AddUser(user model.User) bool {
 	_, err := Collection.InsertOne(context.Background(), user)
 	if err != nil {
@@ -47,7 +47,7 @@ func AddUser(user model.User) bool {
 	return true
 }
 
-// GetUser 获取用户
+// GetUser get user
 func GetUser(_user model.IsUserExist) (user model.User, err error) {
 	filter, err := bson.Marshal(_user)
 	if err != nil {
@@ -64,7 +64,7 @@ func GetUser(_user model.IsUserExist) (user model.User, err error) {
 	return
 }
 
-// GetUserByUid 通过uid获取用户
+// GetUserByUid get user by uid
 func GetUserByUid(uid int) (user model.User, err error) {
 	filter := bson.M{"uid": uid}
 	r := Collection.FindOne(context.Background(), filter)
@@ -77,11 +77,12 @@ func GetUserByUid(uid int) (user model.User, err error) {
 	return
 }
 
-// GetUnusedUid 获取未使用的uid，从1开始
+// GetUnusedUid get a new uid
 func GetUnusedUid() (uid int) {
-	filter := bson.M{} // 查询所有
+	// todo thread safe
+	filter := bson.M{} // all
 	opt := &options.FindOneOptions{
-		Sort: bson.M{"uid": -1}, // 降序
+		Sort: bson.M{"uid": -1}, // desc
 	}
 	r := Collection.FindOne(context.Background(), filter, opt)
 	if r.Err() == mongo.ErrNoDocuments {
@@ -94,4 +95,37 @@ func GetUnusedUid() (uid int) {
 		log.Panicf("decode user error: %s", err)
 	}
 	return user.Uid + 1
+}
+
+// IsEmailExist check if email exist
+func IsEmailExist(email string) bool {
+	filter := bson.M{"email": email}
+	count, err := Collection.CountDocuments(context.Background(), filter)
+	if err != nil {
+		log.Errorf("find email %s error: %s", email, err)
+		return false
+	}
+	log.Debugf("email %s count: %d", email, count)
+	return count > 0
+}
+
+// AllocateUid give an uid to user with -1 uid
+func AllocateUid(user model.User) bool {
+	if user.Uid != -1 {
+		log.Panicf("user %s already has uid: %d", user.Username, user.Uid)
+	}
+
+	filter, _ := bson.Marshal(user)
+	update := bson.M{"$set": bson.M{"uid": GetUnusedUid()}}
+	result, err := Collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Errorf("update user %+v error: %s", user, err)
+		return false
+	}
+	if result.ModifiedCount == 0 {
+		log.Errorf("update user %+v failed", user)
+		return false
+	}
+
+	return true
 }

@@ -3,24 +3,24 @@ module github.com/NoToDoProject/NoToDo
 go 1.20
 
 require (
+	github.com/appleboy/gin-jwt/v2 v2.9.1 // JWT
 	github.com/gin-contrib/cors v1.4.0 // cors 跨域
 	github.com/gin-gonic/gin v1.8.2 // gin web framework HTTP框架
-	github.com/gorilla/websocket v1.5.0 // websocket websocket
+	github.com/jaevor/go-nanoid v1.3.0 // nanoid 随机字符串
 	github.com/sirupsen/logrus v1.9.0 // logrus logger 日志管理
 	github.com/spf13/viper v1.15.0 // viper config 配置管理
 	go.mongodb.org/mongo-driver v1.11.1 // mongo driver mongodb驱动
 	golang.org/x/crypto v0.6.0 // crypto 加密
-	github.com/appleboy/gin-jwt/v2 v2.9.1 // JWT
 )
 
 require (
-	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.11.2 // indirect
+	github.com/go-playground/validator/v10 v10.11.2
 	github.com/goccy/go-json v0.10.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

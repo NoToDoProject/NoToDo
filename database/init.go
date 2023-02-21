@@ -1,8 +1,10 @@
+// Package database MongoDB operations
 package database
 
 import (
 	"context"
 	"github.com/NoToDoProject/NoToDo/config"
+	"github.com/NoToDoProject/NoToDo/database/todo"
 	"github.com/NoToDoProject/NoToDo/database/user"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,18 +14,18 @@ import (
 )
 
 var (
-	// mongoInstance mongo实例
+	// mongoInstance mongoDB client
 	mongoInstance *mongo.Client = nil
-	// Database      数据库实例
-	Database *mongo.Database = nil
+	// database      database instance
+	database *mongo.Database = nil
 )
 
-// Connect 连接数据库
+// Connect connect to database
 func Connect() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Config.Mongo.Uri))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Config.Mongo.URI))
 	if err != nil {
 		log.Fatalf("database create error: %s", err)
 	}
@@ -33,11 +35,12 @@ func Connect() {
 		log.Fatalf("database connect error: %s", err)
 	}
 	log.Info("database connected")
-	Database = mongoInstance.Database("notodo")
+	database = mongoInstance.Database("notodo")
 
-	ConfigCollection = Database.Collection("config")
-	LoadConfig() // 读取配置
+	ConfigCollection = database.Collection("config")
+	LoadConfig() // get config from database
 
-	// 初始化集合
-	user.Collection = Database.Collection("user")
+	// init collections
+	user.Collection = database.Collection("user")
+	todo.ListCollection = database.Collection("todo_list")
 }
