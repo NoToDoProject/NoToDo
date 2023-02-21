@@ -8,33 +8,34 @@ import (
 	"time"
 )
 
-// ConfigInDatabase 配置项
+// ConfigInDatabase config item in database
 type ConfigInDatabase struct {
 	Key   string `bson:"k"`
 	Value any    `bson:"v"`
 }
 
-// ConfigCollection mongo集合
+// ConfigCollection mongo collection
 var ConfigCollection *mongo.Collection
 
-// Config 配置
+// Config config struct
 var Config = struct {
-	NeedRegisterEmailVerification bool          // 是否需要注册邮箱验证
-	EmailVerificationTimeOut      time.Duration // 邮箱验证超时时间
-	CanRegister                   bool          // 是否允许注册
+	NeedRegisterEmailVerification bool          // need register email verification when register
+	EmailVerificationTimeOut      time.Duration // time out of email verification
+	CanRegister                   bool          // enable register
 }{
+	// default values
 	false,
 	time.Minute * 30,
 	true,
 }
 
-// GetConfig 获取配置
+// GetConfig get config from database
 func GetConfig(key string) any {
 	filter := map[string]string{"k": key}
 	var result ConfigInDatabase
 	r := ConfigCollection.FindOne(context.Background(), filter)
 	if r.Err() == mongo.ErrNoDocuments {
-		// 未找到时，设置默认值
+		// set default value when config not found, use reflect to get default value
 		log.Errorf("config %s not found, set default value", key)
 		defaultValue := reflect.ValueOf(Config).FieldByName(key).Interface()
 		_, err := ConfigCollection.InsertOne(context.Background(), ConfigInDatabase{key, defaultValue})
@@ -47,35 +48,33 @@ func GetConfig(key string) any {
 	return result.Value
 }
 
-// LoadConfig 加载配置
+// LoadConfig use reflect to load config
 func LoadConfig() {
 	configValue := reflect.ValueOf(&Config)
 	configElem := configValue.Elem()
 	for i := 0; i < configElem.NumField(); i++ {
-		field := configElem.Field(i)              // 获取字段
-		name := configElem.Type().Field(i).Name   // 字段名
-		typeOfField := configElem.Type().Field(i) // 字段Go类型
-		kind := field.Kind()                      // 字段原始类型
+		field := configElem.Field(i)              // field of config
+		name := configElem.Type().Field(i).Name   // name of config
+		typeOfField := configElem.Type().Field(i) // go type of field
+		kind := field.Kind()                      // raw type of field
 
-		newValue := GetConfig(name)                       // 获取配置
-		kindOfNewValue := reflect.TypeOf(newValue).Kind() // 获取配置原始类型
+		newValue := GetConfig(name)                       // config value
+		kindOfNewValue := reflect.TypeOf(newValue).Kind() // raw type of config
 		if kind != kindOfNewValue {
 			log.Errorf("config %s type error, need %s, got %s", name, kind, kindOfNewValue)
 			continue
 		}
 		log.Debugf("config %s: %v", name, newValue)
 
-		// 如果是时间类型，需要转换
+		// transform type
 		if typeOfField.Type == reflect.TypeOf(time.Minute) {
 			newValue = time.Duration(newValue.(int64))
 		}
 		field.Set(reflect.ValueOf(newValue))
 	}
-
-	log.Debugf("Config in Database: %+v", Config)
 }
 
-// UpdateConfig 更新配置
+// UpdateConfig set new config
 func UpdateConfig(key string, value any) {
 	filter := map[string]string{"k": key}
 	update := map[string]any{"$set": map[string]any{"v": value}}

@@ -1,22 +1,22 @@
 package model
 
-// Config 配置结构体
+// Config configuration
 type Config struct {
-	Server struct { // 服务器配置
-		Host string // 监听地址
-		Port string // 监听端口
+	Server struct {
+		Host string // listen host
+		Port string // listen port
 	}
-	Mongo struct { // MongoDB 配置
-		Uri string // 连接地址
+	Mongo struct { // MongoDB
+		URI string // connection uri
 	}
-	Log struct { // 日志配置
-		Level string // 日志级别
+	Log struct {
+		Level string
 	}
 }
 
-// ConfigInfo 配置项关联信息结构体
+// ConfigInfo configuration related information
 type ConfigInfo struct {
-	Path    string // 配置项路径
-	Env     string // 配置项关联环境变量
-	Default any    // 配置项默认值
+	Path    string // configuration path
+	Env     string // related environment variable
+	Default any    // default value
 }

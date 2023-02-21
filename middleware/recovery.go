@@ -8,7 +8,7 @@ import (
 	"runtime/debug"
 )
 
-// Recovery 恢复中间件，捕获500错误
+// Recovery catch panic
 func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

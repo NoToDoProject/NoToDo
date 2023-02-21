@@ -1,4 +1,4 @@
 package common
 
-// IdentityKeyInContext 用户在上下文中的键
+// IdentityKeyInContext key of user in context
 var IdentityKeyInContext = "user"

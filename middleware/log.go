@@ -5,11 +5,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// LogMiddleware 日志输出中间件
+// LogMiddleware log output
 func LogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
-		reqUrl := c.Request.URL.Path // c.Request.RequestURI 区别：RequestURI 包含查询参数
+		reqUrl := c.Request.URL.Path
 		fields := log.Fields{
 			"Method": method,
 			"Url":    reqUrl,

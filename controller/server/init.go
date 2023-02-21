@@ -1,3 +1,4 @@
+// Package server API to control the server.
 package server
 
 import (
@@ -9,16 +10,16 @@ import (
 type Server struct {
 }
 
-// InitRouter 初始化路由
+// InitRouter add server router
 func (_ Server) InitRouter(r *gin.Engine) {
 	userGroup := r.Group("/server")
 	userGroup.Use()
 	{
-		userGroup.GET("/info", Information)         // 获取服务器信息
-		userGroup.GET("/can_register", CanRegister) // 获取是否允许注册
+		userGroup.GET("/info", Information)
+		userGroup.GET("/can_register", CanRegister)
 	}
 	userGroup.Use(middleware.MiddleFunc)
 	{
-		userGroup.POST("/refresh_config", middleware.IsAdminMiddleware(), RefreshConfig) // 刷新配置
+		userGroup.POST("/refresh_config", middleware.IsAdminMiddleware(), RefreshConfig)
 	}
 }

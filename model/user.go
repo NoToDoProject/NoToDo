@@ -2,40 +2,39 @@ package model
 
 import "time"
 
-// User 用户结构体
 type User struct {
-	Uid             int       `json:"uid" bson:"uid"`                     // 用户 ID，系统自动生成
-	Username        string    `json:"username" bson:"username"`           // 用户名，唯一，不可修改
-	Password        []byte    `json:"-" bson:"password"`                  // 密码
-	Nickname        string    `json:"nickname" bson:"nickname"`           // 显示昵称
-	Email           string    `json:"email" bson:"email"`                 // 邮箱，唯一
-	Disabled        bool      `json:"-" bson:"disabled"`                  // 是否禁用，禁用后无法登录
-	NeedEmailVerify bool      `json:"-" bson:"need_email_verify"`         // 是否需要邮箱验证
-	EmailVerified   bool      `json:"-" bson:"email_verified"`            // 邮箱是否已验证
-	IsAdmin         bool      `json:"-" bson:"is_admin"`                  // 是否为管理员
-	RegisterTime    time.Time `json:"register_time" bson:"register_time"` // 注册时间
+	Uid             int       `json:"uid" bson:"uid"`           // unique, auto increment
+	Username        string    `json:"username" bson:"username"` // unique, can't be changed
+	Password        []byte    `json:"-" bson:"password"`
+	Nickname        string    `json:"nickname" bson:"nickname"` // string for display
+	Email           string    `json:"email" bson:"email"`       // unique
+	Disabled        bool      `json:"-" bson:"disabled"`        // unable to login if disabled
+	NeedEmailVerify bool      `json:"-" bson:"need_email_verify"`
+	EmailVerified   bool      `json:"-" bson:"email_verified"`
+	IsAdmin         bool      `json:"-" bson:"is_admin"` // admin can do anything
+	RegisterTime    time.Time `json:"registerTime" bson:"register_time"`
 }
 
-// IsUserExist 判断用户是否存在
+// IsUserExist check if user exist query
 type IsUserExist struct {
-	Username string `form:"username" bson:"username" binding:"required"` // 用户名
+	Username string `form:"username" bson:"username" binding:"required"`
 }
 
-// UserLogin 用户登录结构体
+// UserLogin login request body
 type UserLogin struct {
-	Username string `json:"username" binding:"required"` // 用户名
-	Password string `json:"password" binding:"required"` // 密码
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
-// UserWithPassword 用户登录结构体
+// UserWithPassword username and password
 type UserWithPassword struct {
-	Username string `bson:"username"` // 用户名
-	Password []byte `bson:"password"` // 密码
+	Username string `bson:"username"`
+	Password []byte `bson:"password"`
 }
 
-// UserRegister 用户注册结构体
+// UserRegister user register request body
 type UserRegister struct {
-	Username string `json:"username" bson:"username" binding:"required"` // 用户名
-	Password string `json:"password" bson:"password" binding:"required"` // 密码
-	Email    string `json:"email" bson:"email" binding:"required,email"` // 邮箱
+	Username string `json:"username" bson:"username" binding:"required"`
+	Password string `json:"password" bson:"password" binding:"required"`
+	Email    string `json:"email" bson:"email" binding:"required,email"`
 }

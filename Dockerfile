@@ -1,4 +1,4 @@
-# 构建二进制文件
+# Build binary file
 FROM golang:1.20-alpine as builder
 COPY . /work
 WORKDIR /work
@@ -12,7 +12,7 @@ RUN export GOOS=${GOOS} && \
     go build -o build/notodo -x -v -trimpath -ldflags="-s -w" .
 
 
-# 构建镜像
+# Build image
 FROM scratch
 COPY --from=builder /work/build/notodo /usr/local/bin/notodo
 EXPOSE 8888

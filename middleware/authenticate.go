@@ -13,34 +13,34 @@ import (
 	"time"
 )
 
-var identityKey = common.IdentityKeyInContext // jwt的payload中的key
+var identityKey = common.IdentityKeyInContext // key for user info in context
 var JWTMiddleware = &jwt.GinJWTMiddleware{
-	Realm:            "notodo",                                                             // 作用域
-	SigningAlgorithm: "HS256",                                                              // 签名算法
-	Key:              []byte("0xk9013kum0uh0cfu0nv-1v2-ic0--cu812u-bc-182c916et2yx87t1b2"), // 签名
-	//KeyFunc:               nil, 			// 签名函数
-	Timeout:       time.Hour * 24, // 过期时间
-	MaxRefresh:    time.Hour * 24, // 允许刷新时间
-	Authenticator: Login,          // 登录函数
-	Authorizator: func(data any, c *gin.Context) bool { // 判断用户是否有权限
+	Realm:            "notodo",
+	SigningAlgorithm: "HS256",
+	Key:              []byte("0xk9013kum0uh0cfu0nv-1v2-ic0--cu812u-bc-182c916et2yx87t1b2"),
+	//KeyFunc:               nil, 			// signature key function
+	Timeout:       time.Hour * 24, // token valid time
+	MaxRefresh:    time.Hour * 24, // can refresh token time
+	Authenticator: Login,          // login function
+	Authorizator: func(data any, c *gin.Context) bool { // check user can access this resource
 		if user, ok := data.(model.User); ok && user.Uid != 0 {
 			c.Set(identityKey, user)
-			return true // 登录就有权限
+			return true // authorized once login, can use RBAC or ABAC if needed
 		}
 		return false
 	},
-	PayloadFunc: func(data any) jwt.MapClaims { // 设置jwt的payload，data是登录函数返回的数据
+	PayloadFunc: func(data any) jwt.MapClaims { // store user info in jwt payload
 		user := data.(model.User)
 		return jwt.MapClaims{
 			"uid": user.Uid,
 		}
 	},
-	Unauthorized: func(c *gin.Context, code int, message string) { // 未登录时返回的信息，message是登录函数返回的err信息
+	Unauthorized: func(c *gin.Context, code int, message string) { // response for unauthorized, message is error message
 		nc := response.ContextEx{Context: c}
 		log.Warnf("Unauthorized: %+v", message)
 		nc.Unauthorized()
 	},
-	LoginResponse: func(c *gin.Context, code int, message string, time time.Time) { // 登录响应
+	LoginResponse: func(c *gin.Context, code int, message string, time time.Time) { // response for login
 		nc := response.ContextEx{Context: c}
 		if code != http.StatusOK {
 			log.Panicf("LoginResponse: %+v", message)
@@ -51,8 +51,8 @@ var JWTMiddleware = &jwt.GinJWTMiddleware{
 			"expire": time.Format("2006-01-02 15:04:05"),
 		})
 	},
-	//LogoutResponse:        nil, // 登出响应函数
-	RefreshResponse: func(c *gin.Context, code int, message string, time time.Time) { // 刷新响应
+	//LogoutResponse:        nil, // response for logout
+	RefreshResponse: func(c *gin.Context, code int, message string, time time.Time) { // response for refresh token
 		nc := response.ContextEx{Context: c}
 		if code != http.StatusOK {
 			log.Panicf("RefreshResponse: %+v", message)
@@ -62,23 +62,23 @@ var JWTMiddleware = &jwt.GinJWTMiddleware{
 			"expire": time.Format("2006-01-02 15:04:05"),
 		})
 	},
-	IdentityHandler: func(context *gin.Context) any { // 请求中获取用户信息
+	IdentityHandler: func(context *gin.Context) any { // get user info from context
 		data := jwt.ExtractClaims(context)
-		uid := int(data["uid"].(float64)) // 这里不知道为什么是float64
+		uid := int(data["uid"].(float64)) // WHY float64?
 		user, err := userDb.GetUserByUid(uid)
 		if err != nil {
 			log.Panicf("IdentityHandler: %+v", err)
 		}
 		return user
 	},
-	IdentityKey:   identityKey,             // payload在context中的key
-	TokenLookup:   "header: Authorization", // 从哪里获取token
-	TokenHeadName: "Bearer",                // token前缀
-	TimeFunc:      time.Now,                // 获取当前时间的函数
-	//HTTPStatusMessageFunc: nil, // 设置http状态码对应的信息
-	SendCookie:        false, // 是否发送cookie
-	SendAuthorization: false, // 在header中设置Authorization
-	DisabledAbort:     false, // 是否禁止context.Abort
+	IdentityKey:   identityKey,             // where to store user info in context
+	TokenLookup:   "header: Authorization", // where to get token
+	TokenHeadName: "Bearer",                // token suffix
+	TimeFunc:      time.Now,                // func to get current time
+	//HTTPStatusMessageFunc: nil, // func to get http status message
+	SendCookie:        false, // set cookie
+	SendAuthorization: false, // set Authorization header
+	DisabledAbort:     false, // will not abort if the token is expired
 }
 var AuthMiddleware, err = jwt.New(JWTMiddleware)
 var MiddleFunc = AuthMiddleware.MiddlewareFunc()
@@ -89,15 +89,15 @@ func init() {
 	}
 }
 
-// Login 登录
+// Login user login
 func Login(c *gin.Context) (any, error) {
 	nc := response.ContextEx{Context: c}
 
-	// 获取登录信息
+	// get login info
 	var loginInfo model.UserLogin
 	_ = nc.BindJSON(&loginInfo)
 
-	// 检查用户是否存在
+	// check user exist
 	var userExist model.IsUserExist
 	common.CopyStruct(&loginInfo, &userExist)
 	userGotten, err := userDb.GetUser(userExist)
@@ -105,22 +105,21 @@ func Login(c *gin.Context) (any, error) {
 		return nil, fmt.Errorf("user not found")
 	}
 
-	// 检查用户是否被禁用
+	// check user disabled
 	if userGotten.Disabled {
 		return nil, fmt.Errorf("user disabled")
 	}
 
-	// 检查密码是否正确
+	// check password
 	password := common.MakeNewPassword(loginInfo)
 	if !common.ComparePassword(userGotten.Password, password) {
 		return nil, fmt.Errorf("password error")
 	}
 
-	// 登录成功
 	return userGotten, nil
 }
 
-// IsAdminMiddleware 管理员中间件
+// IsAdminMiddleware check if user is admin
 func IsAdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		nc := response.ContextEx{Context: c}

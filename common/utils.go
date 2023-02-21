@@ -9,7 +9,7 @@ import (
 	"reflect"
 )
 
-// IsFileExists 判断文件是否存在
+// IsFileExists check file exists
 func IsFileExists(path string) bool {
 	fileInfo, err := os.Stat(path)
 	if fileInfo != nil {
@@ -21,7 +21,7 @@ func IsFileExists(path string) bool {
 	return false
 }
 
-// EncryptPassword 加密密码
+// EncryptPassword encrypt password
 func EncryptPassword(password string) []byte {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -30,13 +30,13 @@ func EncryptPassword(password string) []byte {
 	return hashedPassword
 }
 
-// ComparePassword 比较密码
+// ComparePassword compare password
 func ComparePassword(hashedPassword []byte, password string) bool {
 	err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	return err == nil
 }
 
-// CopyStruct 复制结构体
+// CopyStruct copy struct with same field name and type
 func CopyStruct(src, dst any) {
 	srcValue := reflect.ValueOf(src)
 	dstValue := reflect.ValueOf(dst)
@@ -60,7 +60,7 @@ func CopyStruct(src, dst any) {
 	}
 }
 
-// MakeNewPassword 生成新密码
+// MakeNewPassword add salt to password
 func MakeNewPassword(user model.UserLogin) string {
 	return fmt.Sprintf("%s%s%s", user.Password, "notodo", user.Username)
 }

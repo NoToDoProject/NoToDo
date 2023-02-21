@@ -9,23 +9,23 @@ import (
 
 // XResponseTimeWriter Patch ResponseWriter
 type XResponseTimeWriter struct {
-	gin.ResponseWriter              // 原始的 ResponseWriter
-	context            *gin.Context // 上下文
-	startTime          time.Time    // 请求开始时间
+	gin.ResponseWriter              // origin ResponseWriter
+	context            *gin.Context // origin context
+	startTime          time.Time    // response start time
 }
 
-// TimerMiddleware 请求处理时间记录中间件
+// TimerMiddleware record response time
 func TimerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		newWriter := &XResponseTimeWriter{ResponseWriter: c.Writer, context: c, startTime: time.Now()}
 		c.Writer = newWriter
 		c.Next()
-		// WebSocket 请求不会触发 WriteHeader 方法，所以需要在这里设置
+		// WebSocket will not call WriteHeader, set spend time here
 		c.Set("spend_time", time.Since(newWriter.startTime).String())
 	}
 }
 
-// WriteHeader 重写 WriteHeader 方法
+// WriteHeader override WriteHeader
 func (w *XResponseTimeWriter) WriteHeader(statusCode int) {
 	duration := time.Since(w.startTime)
 	if _, exist := w.context.Get("spend_time"); !exist {

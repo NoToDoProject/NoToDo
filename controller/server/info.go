@@ -8,28 +8,28 @@ import (
 )
 
 var (
-	StartTimestamp = time.Now().Unix() // 服务器启动时间戳
-	Config         = &database.Config  // 配置
+	startTimestamp = time.Now().Unix()
+	config         = &database.Config
 )
 
 // Information 服务器信息
 func Information(c *gin.Context) {
 	nc := response.ContextEx{Context: c}
 	nc.Success(gin.H{
-		"appName":     "NoToDo",                           // 应用名称
-		"currentTime": time.Now().Unix(),                  // 当前时间戳
-		"startTime":   StartTimestamp,                     // 服务器启动时间戳
-		"uptime":      time.Now().Unix() - StartTimestamp, // 服务器运行时间
+		"appName":     "NoToDo",                           // app name
+		"currentTime": time.Now().Unix(),                  // current time
+		"startTime":   startTimestamp,                     // server start time
+		"uptime":      time.Now().Unix() - startTimestamp, // server uptime
 	})
 }
 
-// CanRegister 是否允许注册
+// CanRegister check register enable
 func CanRegister(c *gin.Context) {
 	nc := response.ContextEx{Context: c}
-	nc.Success(Config.CanRegister)
+	nc.Success(config.CanRegister)
 }
 
-// RefreshConfig 从数据库刷新配置
+// RefreshConfig reload config from database
 func RefreshConfig(c *gin.Context) {
 	nc := response.ContextEx{Context: c}
 	database.LoadConfig()

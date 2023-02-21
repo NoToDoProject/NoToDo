@@ -1,3 +1,4 @@
+// Package config loads the configuration file and environment variables.
 package config
 
 import (
@@ -8,20 +9,21 @@ import (
 	"os"
 )
 
+// Config global config
 var Config model.Config
 
 func init() {
-	// 读取 .env 文件并设置环境变量
+	// load .env file
 	if common.IsFileExists(".env") {
 		v := viper.New()
-		v.SetConfigName(".env") // 读取 .env 文件
-		v.SetConfigType("env")  // 使用 env 格式
-		v.AddConfigPath(".")    // 读取当前目录
-		err := v.ReadInConfig() // 读取配置文件
+		v.SetConfigName(".env")
+		v.SetConfigType("env")
+		v.AddConfigPath(".")
+		err := v.ReadInConfig()
 		if err != nil {
 			log.Fatalf("Error reading config file, %s", err)
 		}
-		// 循环设置环境变量
+		// set environment variables
 		for _, key := range v.AllKeys() {
 			err := os.Setenv(key, v.GetString(key))
 			if err != nil {
@@ -31,9 +33,9 @@ func init() {
 	}
 }
 
-// LoadConfig 读取配置
+// LoadConfig load config from config.yaml and environment variables
 func LoadConfig() {
-	// 读取 config.yaml 文件
+	// load config.yaml
 	v := viper.New()
 	v.SetConfigName("config")
 	v.SetConfigType("yaml")
@@ -56,7 +58,7 @@ func LoadConfig() {
 		}
 	}
 
-	v.AutomaticEnv() // 读取环境变量
+	v.AutomaticEnv() // get environment variables
 	err := v.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -66,7 +68,7 @@ func LoadConfig() {
 		}
 	}
 
-	err = v.Unmarshal(&Config) // 反序列化
+	err = v.Unmarshal(&Config) // unmarshal config to struct
 	if err != nil {
 		log.Fatalf("Error unmarshaling config, %s", err)
 	}

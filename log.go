@@ -6,14 +6,14 @@ import (
 )
 
 func init() {
-	// 设置日志格式为Text格式
+	// set text output
 	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: "2006-01-02 15:04:05", // 时间格式
-		ForceColors:     true,                  // 强制颜色
-		//FullTimestamp:   true,                  // 显示完整时间
+		TimestampFormat: "2006-01-02 15:04:05", // time format
+		ForceColors:     true,                  // force show color
+		//FullTimestamp:   true,                  // show full time format
 	})
 
-	// 设置将日志输出到标准输出（默认的输出为stderr）
-	// 日志消息输出可以是任意的io.writer类型
+	// set output to stdout, default is stderr
+	// can be any io.Writer, see below for File example
 	log.SetOutput(os.Stdout)
 }
