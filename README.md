@@ -1,5 +1,6 @@
 # NoToDo 后端程序
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f9bb9db593404475974e14889529fe6e)](https://app.codacy.com/gh/NoToDoProject/NoToDo?utm_source=github.com&utm_medium=referral&utm_content=NoToDoProject/NoToDo&utm_campaign=Badge_Grade_Settings)
 [![Go Report Card](https://goreportcard.com/badge/github.com/NoToDoProject/NoToDo)](https://goreportcard.com/report/github.com/NoToDoProject/NoToDo)
 
 不要做！！！，NoToDo，发音 /nɒt tʊ duː/，即 Not To Do，
