@@ -19,12 +19,9 @@ type ContextEx struct {
 func (c *ContextEx) BindWith(obj any, binding binding.Binding) error {
 	err := c.ShouldBindWith(obj, binding)
 	// when body is empty, err is EOF
-	if _, ok := err.(error); ok {
-		err = validator.ValidationErrors{}
-	}
 	if err != nil {
 		c.ParameterError()
-		panic(err)
+		panic(validator.ValidationErrors{})
 	}
 	return err
 }

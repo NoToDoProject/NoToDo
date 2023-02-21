@@ -57,15 +57,15 @@ go run main.go
 
 ### 依赖
 
-  - [gin](https://github.com/gin-gonic/gin) - Web框架
-  - [viper](https://github.com/spf13/viper) - 配置管理
-  - [logrus](https://github.com/sirupsen/logrus) - 日志处理
-  - [gin-cors](https://github.com/gin-contrib/cors) - 跨域处理
-  - [websocket](https://github.com/gorilla/websocket) - WebSocket
-  - [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - mongodb数据库驱动
-  - [crypto](https://pkg.go.dev/golang.org/x/crypto) - 密码加密
-  - [gin-jwt](https://github.com/appleboy/gin-jwt) - JWT认证
-  - [nanoid](https://github.com/jaevor/go-nanoid) - NanoID 生成
+- [gin](https://github.com/gin-gonic/gin) - Web框架
+- [viper](https://github.com/spf13/viper) - 配置管理
+- [logrus](https://github.com/sirupsen/logrus) - 日志处理
+- [gin-cors](https://github.com/gin-contrib/cors) - 跨域处理
+- [websocket](https://github.com/gorilla/websocket) - WebSocket
+- [mongo-driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo) - mongodb数据库驱动
+- [crypto](https://pkg.go.dev/golang.org/x/crypto) - 密码加密
+- [gin-jwt](https://github.com/appleboy/gin-jwt) - JWT认证
+- [nanoid](https://github.com/jaevor/go-nanoid) - NanoID 生成
 
 ### 运行测试
 
