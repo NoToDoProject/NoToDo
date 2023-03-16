@@ -12,14 +12,15 @@ type Server struct {
 
 // InitRouter add server router
 func (Server) InitRouter(r *gin.Engine) {
-	userGroup := r.Group("/server")
-	userGroup.Use()
+	serverGroup := r.Group("/server")
+	serverGroup.Use()
 	{
-		userGroup.GET("/info", Information)
-		userGroup.GET("/can_register", CanRegister)
+		serverGroup.GET("/info", Information)
+		serverGroup.GET("/can_register", CanRegister)
+		serverGroup.GET("/ping", Ping)
 	}
-	userGroup.Use(middleware.MiddleFunc)
+	serverGroup.Use(middleware.MiddleFunc)
 	{
-		userGroup.POST("/refresh_config", middleware.IsAdminMiddleware(), RefreshConfig)
+		serverGroup.POST("/refresh_config", middleware.IsAdminMiddleware(), RefreshConfig)
 	}
 }

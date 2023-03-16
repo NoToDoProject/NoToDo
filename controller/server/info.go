@@ -35,3 +35,9 @@ func RefreshConfig(c *gin.Context) {
 	database.LoadConfig()
 	nc.Success()
 }
+
+// Ping test if server is alive
+func Ping(c *gin.Context) {
+	nc := response.ContextEx{Context: c}
+	nc.Success()
+}

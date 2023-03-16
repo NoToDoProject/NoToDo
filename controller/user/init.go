@@ -22,6 +22,6 @@ func (User) InitRouter(r *gin.Engine) {
 	{
 		userGroup.GET("/info", info)
 		userGroup.GET("/exist", middleware.IsAdminMiddleware(), isUserExist)
-		userGroup.GET("/refresh_token", middleware.IsAdminMiddleware(), middleware.AuthMiddleware.RefreshHandler)
+		userGroup.GET("/token", middleware.IsAdminMiddleware(), middleware.AuthMiddleware.RefreshHandler)
 	}
 }
